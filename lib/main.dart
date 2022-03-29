@@ -76,6 +76,18 @@ class _QuizPageState extends State<QuizPage> {
             ),
             Expanded(
               flex: 2,
+              child: SizedBox(
+                width: double.infinity,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: answerButton(Colors.yellow, 'Maybe', onPressed: () {
+                    score.add(nonAnswered);
+                  }),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: SizedBox(
@@ -86,18 +98,6 @@ class _QuizPageState extends State<QuizPage> {
                     } else {
                       score.add(wrongAnswer);
                     }
-                  }),
-                ),
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: answerButton(Colors.yellow, 'Maybe', onPressed: () {
-                    score.add(nonAnswered);
                   }),
                 ),
               ),
