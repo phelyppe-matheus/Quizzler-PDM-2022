@@ -13,7 +13,7 @@ class QuizBrain {
           Question('Kakaroto morre?', true),
           Question('Angiosperma tem fruto?', true),
           Question('A soma de dois numeros aleatórios aumenta a aleatoriedade?',
-              true),
+              false),
           Question('E o pão, morreu?', true),
           Question('A magda é inteligente?', false),
           Question('O sol é ciano?', false),
