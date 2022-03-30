@@ -46,4 +46,8 @@ class QuizBrain {
   get getIndex {
     return _questionNumber;
   }
+
+  set questionNumber(number) {
+    _questionNumber = number;
+  }
 }

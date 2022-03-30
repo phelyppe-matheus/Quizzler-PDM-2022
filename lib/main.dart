@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:quizzler/quiz_brain.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async => runApp(const Quizzler());
 
@@ -26,15 +27,45 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   QuizBrain quizes = QuizBrain();
+
   List<Icon> scoreIcons = [];
   int scoreRight = 0;
   int scoreWrong = 0;
 
   @override
+  void initState() {
+    super.initState();
+
+    _prefs.then((prefs) {
+      int counter = 0;
+      while (counter < 10) {
+        int? value = prefs.getInt('answer$counter');
+        if (value == 0) {
+          print('false');
+          wrongAnswer(counter);
+        } else if (value == 1) {
+          print('true');
+          rightAnswer(counter);
+        } else if (value == 2) {
+          print('maybe');
+          nonAnswered(counter);
+        } else {
+          print('end');
+          break;
+        }
+        setState(() {});
+        counter++;
+      }
+      quizes.questionNumber = prefs.getInt('lastQuestion') ?? 0;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 239, 244, 248),
+      backgroundColor: Color.fromARGB(255, 239, 244, 248),
       appBar: AppBar(
         title: const Text('Quizzler'),
       ),
@@ -65,9 +96,9 @@ class _QuizPageState extends State<QuizPage> {
                   width: double.infinity,
                   child: answerButton(Colors.green, 'True', onPressed: () {
                     if (quizes.getQuestionAnswer() == true) {
-                      rightAnswer();
+                      rightAnswer(quizes.getIndex);
                     } else {
-                      wrongAnswer();
+                      wrongAnswer(quizes.getIndex);
                     }
                   }, context: context),
                 ),
@@ -80,7 +111,7 @@ class _QuizPageState extends State<QuizPage> {
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: answerButton(Colors.yellow, 'Maybe', onPressed: () {
-                    nonAnswered();
+                    nonAnswered(quizes.getIndex);
                   }, context: context),
                 ),
               ),
@@ -95,9 +126,9 @@ class _QuizPageState extends State<QuizPage> {
                       const Color.fromRGBO(244, 67, 54, 1), 'False',
                       onPressed: () {
                     if (quizes.getQuestionAnswer() == false) {
-                      rightAnswer();
+                      rightAnswer(quizes.getIndex);
                     } else {
-                      wrongAnswer();
+                      wrongAnswer(quizes.getIndex);
                     }
                   }, context: context),
                 ),
@@ -140,6 +171,10 @@ class _QuizPageState extends State<QuizPage> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
         quizes.nextQuestion();
+
+        _prefs.then((prefs) {
+          prefs.setInt('lastQuestion', quizes.getIndex);
+        });
       },
       child: Text(
         text,
@@ -151,17 +186,26 @@ class _QuizPageState extends State<QuizPage> {
     );
   }
 
-  void rightAnswer() {
+  void rightAnswer(index) {
     scoreIcons.add(const Icon(Icons.check, color: Colors.green));
     scoreRight++;
+    _prefs.then((prefs) {
+      prefs.setInt('answer$index', 1);
+    });
   }
 
-  void wrongAnswer() {
+  void wrongAnswer(index) {
     scoreIcons.add(const Icon(Icons.delete, color: Colors.red));
     scoreWrong++;
+    _prefs.then((prefs) {
+      prefs.setInt('answer$index', 0);
+    });
   }
 
-  void nonAnswered() {
+  void nonAnswered(index) {
     scoreIcons.add(const Icon(Icons.warning, color: Colors.yellow));
+    _prefs.then((prefs) {
+      prefs.setInt('answer$index', 2);
+    });
   }
 }
