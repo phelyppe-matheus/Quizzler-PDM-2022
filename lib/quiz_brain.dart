@@ -42,4 +42,8 @@ class QuizBrain {
       reset();
     }
   }
+
+  get getIndex {
+    return _questionNumber;
+  }
 }
